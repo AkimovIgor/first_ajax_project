@@ -1,0 +1,62 @@
+html,
+body {
+    height: 100%;
+}
+main {
+    min-height: calc(100vh - 72px);
+}
+.page-link,
+.custom-control-label {
+    user-select: none;
+}
+.dropdown-submenu {
+    display: block;
+    position: relative;
+}
+#comments {
+    overflow-x: auto;
+}
+#th {
+    cursor: pointer;
+}
+
+.dropdown-menu {
+    overflow: visible !important;
+}
+.dropleft .dropdown-list {
+    position: absolute;
+    min-width: 300px;
+    overflow: hidden !important;
+    right: 99% !important;
+    top: -100% !important;
+}
+
+.loader {
+    display: none;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 3000;
+    background: rgba(0, 0, 0, 0);
+    width: 100%;
+    height: 100%;
+}
+.loader-image {
+    margin: 0 auto;
+    width: 25px;
+    position: relative;
+    top: 50%;
+    user-select: none;
+}
+.loader-image img {
+    width: 25px;
+}
+
+@media (max-width: 768px) {
+    .dropleft .dropdown-menu {
+        margin-right: 0 !important;
+    }
+    #edit {
+        margin-top: 20px;
+    }
+} 
