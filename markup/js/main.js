@@ -71,8 +71,6 @@ $(document).ready(function() {
     });
     
 
-
-
     // Загрузка файла
     $('#edit').on('click', function(e) {
         e.preventDefault();
@@ -152,37 +150,6 @@ $(document).ready(function() {
                 }
             }
         });
-        // var myformData = new FormData();
-
-        // email = $('#exampleFormControlInputemail').val();
-
-        // if ($('#exampleFormControlInputfile')[0].files['length']) {
-        //     file = $('#exampleFormControlInputfile')[0].files[0];
-        //     myformData.append('file', file);
-        // }
-      
-        
-        // $.ajax({
-        //     url: '/upload.php',
-        //     method: 'post',
-        //     dataType: 'json',
-        //     cache: false,
-        //     contentType: false,
-        //     processData: false,
-        //     data: myformData,
-        //     enctype: 'multipart/form-data',
-            
-        //     success: function(response){
-        //         console.log(response);
-        //         console.log("файл успешно отправлен", response);
-        //         updateProfile();
-        //     },
-        //     error: function(response){
-        //         console.log(response);
-        //         console.log("нет файла для отправки");
-        //         updateProfile();
-        //     }
-        // });
     });
 
     // Изменение файла
@@ -235,8 +202,7 @@ $(document).ready(function() {
             }
         }
         
-      
-        
+
         $.ajax({
             url: '/upload.php',
             method: 'post',
@@ -281,53 +247,6 @@ $(document).ready(function() {
     $('.close').on('click', function() {
         $('.alert').hide();
     });
-
-    // $('#exampleFormControlInputemail').on('change', function(e){
-    //     e.preventDefault();
-
-    //     name = $('#exampleFormControlInputname').val();
-    //     email = $('#exampleFormControlInputemail').val();
-    //     edit = $('#edit').attr('name');
-
-    //     data = {name: name, email: email, edit: edit};
-
-    //     if ($('#exampleFormControlInputfile')[0].files['length']) {
-    //         file = $('#exampleFormControlInputfile')[0].files[0]['name'];
-    //         data['image'] = file;
-    //     }
-        
-    //     $.ajax({
-    //         type: "POST",
-    //         url: "profile.php#profile",
-    //         data: data,
-    //         dataType: "json",
-    //         success: function (response) {
-    //             console.log(response);
-    //             if (response[0]['success']) {
-                    
-    //                 eraseAllFields(data)
-                    
-    //                 $('.alert').find('span.text').html(response[0]['success']);
-    //                 $('.alert').css('display', 'block');
-
-    //                 $('#navbarDropdownMenuLink').text(response[1] + ' ');
-    //             }
-    //             if (response[0]['errors']) {
-    //                 $('.alert').css('display', 'none');
-
-    //                 eraseAllFields(data);
-
-    //                 for (error in response[0]['errors']) {
-    //                     if (error) {
-    //                         $('#exampleFormControlInput' + error).addClass('is-invalid');
-    //                         $('#exampleFormControlInput' + error).next('span').find('strong').html(response[0]['errors'][error]);
-    //                         $('#exampleFormControlInput' + error).next('span').css('display', 'block');
-    //                     } 
-    //                 }
-    //             }
-    //         }
-    //     });
-    // });
 
 
     // Изменение пароля
@@ -395,15 +314,6 @@ $(document).ready(function() {
     });
 
 
-    function goUp() {
-        var top = Math.max(document.body.scrollTop,document.documentElement.scrollTop);
-        if(top > 0) {
-           window.scrollBy(0,-100);
-           timeOut = setTimeout('goUp()',20);
-        } else clearTimeout(timeOut);
-     }
-
-
     // Выбор темы
     $('.theme-item').on('click', function(e){
         e.preventDefault();
@@ -449,25 +359,17 @@ $(document).ready(function() {
             success: function (response) {
                 //console.log(response);
                 if (response['messages']['success']) {
-                    // $('.alert').find('span.text').html(response['messages']['success']);
-                    // $('.alert').css('display', 'block');
-
                     
-
                     eraseAllFields(arrData);
                     
                     $('#navbarDropdownMenuLink').text(response['name'] + ' ');
 
                     $('#exampleFormControlInputname').val('');
                     $('#exampleFormControlInputemail').val('');
-                    
-                    //$("html, body").animate({scrollTop: 0}, 700);
 
                     window.location.href = '/';
                 }
                 if (response['messages']['errors']) {
-                    
-                    // $('.alert').css('display', 'none');
                     
                     eraseAllFields(arrData);
 
@@ -500,8 +402,6 @@ $(document).ready(function() {
             success: function (response) {
                 //console.log(response);
                 if (response['messages']['success']) {
-                    // $('.alert').find('span.text').html(response['messages']['success']);
-                    // $('.alert').css('display', 'block');
 
                     $("html, body").animate({scrollTop: 0}, 700);
 
@@ -512,8 +412,6 @@ $(document).ready(function() {
                     window.location.href = '/';
                 }
                 if (response['messages']['errors']) {
-                    // $('.alert').css('display', 'none');
-                    // hideSuccess(arrData);
                     eraseAllFields(arrData);
                     printAllErrors(response['messages']['errors']);
                     $("html, body").animate({scrollTop: 0}, 0);
@@ -521,10 +419,6 @@ $(document).ready(function() {
             }
         });
     });
-
-
-    
-
 });
 
 

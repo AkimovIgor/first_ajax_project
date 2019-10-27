@@ -16,8 +16,6 @@ $options = [
 ];
 
 // Подключение к базе данных с помощью объекта PDO
-//$pdo = new PDO($dsn, $dbUser, $dbPassword, $options);
-
 try {
     $pdo = new PDO($dsn, $dbUser, $dbPassword, $options);
 } catch (PDOException $e) {

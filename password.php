@@ -1,9 +1,11 @@
 <?php
-
+// подключаем бд
 require_once('db.php');
 
+// стартуем сессию
 session_start();
 
+// если пользователь не существует
 if (!isset($_SESSION['user'])) {
     // если существуют куки с данными
     if (isset($_COOKIE['user'])) {
@@ -83,7 +85,7 @@ function changeUserPassword($pdo, $email) {
     }
 
     
-    
+    // данные для JSON (много лишнего для дебага)
     $data = [
         'messages' => $messages,
         'SESSION' => $_SESSION,
@@ -91,7 +93,9 @@ function changeUserPassword($pdo, $email) {
         'validation' => $validation,
     ];
     
-    echo json_encode($data);die;
+    // отправка данных
+    echo json_encode($data);
+    die;
 }
 
 /**
@@ -123,6 +127,7 @@ function checkCurrentPassword($pdo, $currentPass, $currentEmail) {
     return false;
 }
 
+// если пользователь нажал на кнопку изменить пароль
 if (isset($_POST['edit'])) {
-    changeUserPassword($pdo, $email);
+    changeUserPassword($pdo, $email); // вызвать функцию
 }

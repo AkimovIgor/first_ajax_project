@@ -46,8 +46,6 @@ $(document).ready(function(){
         if (!confirm('Вы действительно хотите удалить запись?')) {
             return false;
         }
-        
-        
 
         $.ajax({
             method: 'POST',

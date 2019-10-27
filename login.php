@@ -1,10 +1,12 @@
 <?php
-
+// подключение к бд и функций
 require_once('db.php');
 require_once('functions.php');
 
+// старт сессии
 session_start();
 
+// заголовок страницы
 $title = 'Авторизация';
 
 // если сессия с данными пользователя не существует
@@ -15,18 +17,25 @@ if (!isset($_SESSION['user'])) {
         $name = $_COOKIE['user']['name'];
         $email = $_COOKIE['user']['email'];
     }
-    
 } else {
     $isLogin = $_SESSION['user']['is_login'];
     $name = $_SESSION['user']['name'];
     $email = $_SESSION['user']['email'];
 }
+
 // переменная для автозаполнения полей
-    if (isset($_COOKIE['user'])) {
-        $fieldData = $_COOKIE['user'];
-    } else {
-        $fieldData = $_SESSION['fieldData'];
-    }
+if (isset($_COOKIE['user'])) {
+    $fieldData = $_COOKIE['user'];
+} else {
+    $fieldData = $_SESSION['fieldData'];
+}
+
+/**
+ * Авторизация пользователя
+ *
+ * @param [object] $pdo
+ * @return void
+ */
 function userLogin($pdo) {
     
     if (empty($_POST)) {
@@ -47,7 +56,7 @@ function userLogin($pdo) {
     $_SESSION['fieldData']['email'] = $email;
     $_SESSION['fieldData']['password'] = $password;
 
-    // валидация для корректного ввода email
+    // валидация полей
     if (!preg_match("/^(?:[a-z0-9]+(?:[-_.]?[a-z0-9]+)?@[a-z0-9_.-]+(?:\.?[a-z0-9]+)?\.[a-z]{2,5})$/i", $email)) {
         $validation = false;
         $messages['errors']['email'] = 'Введенный вами email не соответствует формату!';
@@ -87,7 +96,6 @@ function userLogin($pdo) {
             // добавление флеш-сообщения
             $messages['success'] = 'Вход успешно выполнен!';
             
-            //dd($rememberMe);
             // стоит галочка "Запомнить меня"
             if ($rememberMe) {
                 
@@ -121,32 +129,30 @@ function userLogin($pdo) {
     $_SESSION['messages'] = $messages;
 
 
+    // данные для JSON (много лишнего для дебага)
     $data = [
         'messages' => $messages,
         'SESSION' => $_SESSION,
         'COOKIE' => $_COOKIE,
         'remember' => $rememberMe,
     ];
+
     // уничтожение сессий
     unset($_SESSION['messages']);
     unset($_SESSION['fieldData']);
 
+    // отправка данных 
     echo json_encode($data);
     die;
 }
 
+// если пользователь нажал кнопку войти
 if (isset($_POST['submit'])) {
-    
-
     // данные пользователя
     $user =  $_SESSION['user'];
-    
-
+    // вызываем функцию авторизации
     userLogin($pdo);
 }
-
-
-
 ?>
 
 <?php require_once('includes/header.php'); ?>
@@ -165,7 +171,7 @@ if (isset($_POST['submit'])) {
                                         <label for="exampleFormControlInputemail" class="col-md-4 col-form-label text-md-right">E-Mail адрес</label>
 
                                         <div class="col-md-6">
-                                            <input id="exampleFormControlInputemail" class="form-control" name="email"  autocomplete="email" autofocus value="<?= $fieldData['email']; ?>">
+                                            <input id="exampleFormControlInputemail" class="form-control" name="email"  autocomplete="email" autofocus value="<?= $fieldData['email']; ?>" maxlength="40">
                                             
                                                 <span class="invalid-feedback" role="alert" style="display: none;">
                                                     <strong></strong>
@@ -177,7 +183,7 @@ if (isset($_POST['submit'])) {
                                         <label for="exampleFormControlInputpassword" class="col-md-4 col-form-label text-md-right">Пароль</label>
 
                                         <div class="col-md-6">
-                                            <input id="exampleFormControlInputpassword" type="password" class="form-control" name="password"  autocomplete="current-password" value="<?= $fieldData['password']; ?>">
+                                            <input id="exampleFormControlInputpassword" type="password" class="form-control" name="password"  autocomplete="current-password" value="<?= $fieldData['password']; ?>" maxlength="30">
                                             
                                                 <span class="invalid-feedback" role="alert" style="display: none;">
                                                     <strong></strong>
@@ -188,25 +194,11 @@ if (isset($_POST['submit'])) {
                                     <div class="form-group row">
                                         <div class="col-md-6 offset-md-4">
 
-
-
-                                            <!-- <div class="custom-control custom-switch">
-                                                <input type="checkbox" class="custom-control-input" name="remember" id="exampleFormControlInputremember" >
-                                                <label class="custom-control-label" for="exampleFormControlInputremember">Запомнить меня</label>
-                                            </div> -->
-
                                             <div class="custom-control custom-checkbox">
                                                 <input type="checkbox" class="custom-control-input" id="exampleFormControlInputremember" >
                                                 <label class="custom-control-label" for="exampleFormControlInputremember">Запомнить меня</label>
                                             </div>
-
-                                            <!-- <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="remember" id="exampleFormControlInputremember" >
-
-                                                <label class="form-check-label" for="exampleFormControlInputremember">
-                                                    Запомнить меня
-                                                </label>
-                                            </div> -->
+                                            
                                         </div>
                                     </div>
 

@@ -5,7 +5,7 @@ require_once('db.php');
 // старт сессии
 session_start();
 
-
+// заголовок страницы
 $title = 'Регистрация';
 
 // если сессия с данными пользователя не существует
@@ -16,7 +16,6 @@ if (!isset($_SESSION['user'])) {
         $name = $_COOKIE['user']['name'];
         $email = $_COOKIE['user']['email'];
     }
-    
 } else {
     $isLogin = $_SESSION['user']['is_login'];
     $name = $_SESSION['user']['name'];
@@ -56,13 +55,13 @@ function userRegister($pdo) {
         $validation = false;
         $messages['errors']['name'] = 'Введите имя!';
     }
-    // валидация на уже существующий email
+
+    // валидация полей
     $email_exist = checkEmail($pdo, $email);
     if ($email_exist) {
         $validation = false;
         $messages['errors']['email'] = 'Введенный вами email уже существует!';
     }
-    // валидация для корректного ввода email
     if (!preg_match("/^(?:[a-z0-9]+(?:[-_.]?[a-z0-9]+)?@[a-z0-9_.-]+(?:\.?[a-z0-9]+)?\.[a-z]{2,5})$/i", $email)) {
         $validation = false;
         $messages['errors']['email'] = 'Введенный вами email не соответствует формату!';
@@ -120,16 +119,12 @@ function userRegister($pdo) {
 
         // заносим массив флеш-сообщений в сессию
         $_SESSION['messages'] = $messages;
-
-        // // редирект на главную
-        // header('Location: /');
-
     }
 
     $data = [
         'messages' => $messages,
     ];
-
+    // отправляем данные
     echo json_encode($data);
     die;
 }
@@ -155,21 +150,11 @@ function checkEmail($pdo, $email) {
     return false;
 }
 
+// если пользователь нажал кнопку зарегистрироваться
 if (isset($_POST['submit'])) {
     // вызов функции регистрации
     userRegister($pdo);
 }
-
-
-// переменная для вывода мини-сообщений под полями
-// $errors = $_SESSION['messages']['errors'];
-
-// // переменная для автозаполнения полей
-// $fieldData = $_SESSION['fieldData'];
-
-// // уничтожение сессий
-// unset($_SESSION['messages']['errors']);
-// unset($_SESSION['fieldData']);
 ?>
 
 <?php require_once('includes/header.php'); ?>
@@ -188,11 +173,11 @@ if (isset($_POST['submit'])) {
                                         <label for="exampleFormControlInputname" class="col-md-4 col-form-label text-md-right">Имя</label>
 
                                         <div class="col-md-6">
-                                            <input id="exampleFormControlInputname" type="text" class="form-control" name="name" autofocus value="<?= $fieldData['name'] ?>">
+                                            <input id="exampleFormControlInputname" type="text" class="form-control" name="name" autofocus value="<?= $fieldData['name'] ?>" maxlength="15">
                                                 
-                                                    <span class="invalid-feedback" role="alert" style="display: none;">
-                                                        <strong></strong>
-                                                    </span>
+                                            <span class="invalid-feedback" role="alert" style="display: none;">
+                                                <strong></strong>
+                                            </span>
                                         </div>
                                     </div>
 
@@ -200,11 +185,11 @@ if (isset($_POST['submit'])) {
                                         <label for="exampleFormControlInputemail" class="col-md-4 col-form-label text-md-right">E-Mail адрес</label>
 
                                         <div class="col-md-6">
-                                            <input id="exampleFormControlInputemail" type="text" class="form-control" name="email" value="<?= $fieldData['email'] ?>">
+                                            <input id="exampleFormControlInputemail" type="text" class="form-control" name="email" value="<?= $fieldData['email'] ?>" maxlength="40">
                                             
-                                                <span class="invalid-feedback" role="alert" style="display: none;">
-                                                    <strong></strong>
-                                                </span>
+                                            <span class="invalid-feedback" role="alert" style="display: none;">
+                                                <strong></strong>
+                                            </span>
                                         </div>
                                     </div>
 
@@ -212,15 +197,11 @@ if (isset($_POST['submit'])) {
                                         <label for="exampleFormControlInputpassword" class="col-md-4 col-form-label text-md-right">Пароль</label>
 
                                         <div class="col-md-6">
-                                            <input id="exampleFormControlInputpassword" type="password" class="form-control" name="password"  autocomplete="new-password" value="<?= $fieldData['password'] ?>">
+                                            <input id="exampleFormControlInputpassword" type="password" class="form-control" name="password"  autocomplete="new-password" value="<?= $fieldData['password'] ?>" maxlength="30">
                                             
-                                                <span class="invalid-feedback" role="alert" style="display: none;">
-                                                    <strong></strong>
-                                                </span>
-
-                                                <!-- <span class="invalid-feedback" role="alert" style="display: none;">
-                                                    <strong></strong>
-                                                </span> -->
+                                            <span class="invalid-feedback" role="alert" style="display: none;">
+                                                <strong></strong>
+                                            </span>
                                         </div>
                                     </div>
 
@@ -228,11 +209,11 @@ if (isset($_POST['submit'])) {
                                         <label for="exampleFormControlInputpassword_confirmation" class="col-md-4 col-form-label text-md-right">Пароль еще раз</label>
 
                                         <div class="col-md-6">
-                                            <input id="exampleFormControlInputpassword_confirmation" type="password" class="form-control" name="password_confirmation"  autocomplete="new-password">
+                                            <input id="exampleFormControlInputpassword_confirmation" type="password" class="form-control" name="password_confirmation"  autocomplete="new-password" maxlength="30">
                                             
-                                                <span class="invalid-feedback" role="alert" style="display: none;">
-                                                    <strong></strong>
-                                                </span>
+                                            <span class="invalid-feedback" role="alert" style="display: none;">
+                                                <strong></strong>
+                                            </span>
                                         </div>
                                     </div>
 

@@ -16,17 +16,16 @@ function dd($variable, $die = true) {
 }
 
 
-
-
 /**
  * Пагинатор
  *
  * @param [type] $pdo
- * @return void
+ * @return array
  */
 function paginator($pdo) {
 
     $paginator = [];
+    // кол-во ссылок по правую и левую сторону от активной
     $numLinks = 2;
     // получаем текущую страницу
     $paginator['currentPage'] = isset($_GET['page']) ? $_GET['page'] <= 0 ? 1 : $_GET['page'] : 1;

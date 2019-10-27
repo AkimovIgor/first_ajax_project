@@ -1,11 +1,12 @@
 <?php
-// Подключение файла соединения с БД
+// Подключение файла соединения с БД и функций
 require_once('db.php');
 require_once('functions.php');
 
 // старт сессии
 session_start();
 
+// заголовок страницы
 $title = 'Главная';
 
 // если сессия с данными пользователя не существует
@@ -16,7 +17,6 @@ if (!isset($_SESSION['user'])) {
         $name = $_COOKIE['user']['name'];
         $email = $_COOKIE['user']['email'];
     }
-    
 } else {
     // если же сессия с данными пользователя существует
     $isLogin = $_SESSION['user']['is_login'];
@@ -112,13 +112,13 @@ function checkUser($pdo, $email) {
     return $row['id'];
 }
 
+// получаем пагинатор
 $paginator = paginator($pdo);
 
 // получение ID текущего пользователя
 $userId = checkUser($pdo, $email);
 
-
-
+// если запрос пришел AJAX-ом, то подключаем один шаблон, иначе - другой
 if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
     require_once('templates/ajax_index.php');
     echo '<script src="./markup/js/pagination.js" defer></script>';
@@ -132,8 +132,4 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
     if(!isset($_POST['store'])) {
         echo '<script src="./markup/js/pagination.js" defer></script>';
     }
-    
 }
-?>
-
-

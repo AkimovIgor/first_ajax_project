@@ -1,12 +1,13 @@
 <?php
 
-// Подключение файла соединения с БД
+// Подключение файла соединения с БД и функций
 require_once('db.php');
 require_once('functions.php');
 
 // старт сессии
 session_start();
 
+// заголовок страницы
 $title = 'Административная панель';
 
 // осуществление доступа админке
@@ -71,7 +72,14 @@ function getAllComments($pdo) {
     return $row;
 }
 
-
+/**
+ * Получение всех комментариев для пагинации
+ *
+ * @param [object] $pdo
+ * @param [int] $offset
+ * @param [int] $limit
+ * @return void
+ */
 function getAllComsForPaginate($pdo, $offset, $limit) {
     
     $sql = "SELECT cs.*, us.name, us.image 
@@ -80,7 +88,7 @@ function getAllComsForPaginate($pdo, $offset, $limit) {
             ON cs.user_id = us.id 
             ORDER BY cs.id DESC 
             LIMIT $offset,$limit";
-    //dd($sql);
+
     // выполняем sql-запрос
     $stmt = $pdo->query($sql);
     // формируем ассоциативный массив полученных данных
@@ -107,12 +115,13 @@ function prettyDate($date) {
 }
 
 
-
+// настройки пагинатора
 $paginator = paginator($pdo);
 $paginator['link'] = 'admin.php/?page=';
 $paginator['comments'] = getAllComsForPaginate($pdo, $paginator['offset'], $paginator['perPage']);
 
 
+// если это ajax-запрос подключать одни скрипты
 if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
     require_once('templates/ajax_admin.php');
     echo '<script src="./markup/js/pagination.js" defer></script>';
@@ -125,12 +134,8 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
     echo '<script src="./markup/js/bootstrap.js" defer></script>';
     echo '<script src="./markup/js/main.js" defer></script>';
     echo '<script src="./markup/js/admin.js" defer></script>';
+
     if(!isset($_POST['store'])) {
         echo '<script src="./markup/js/pagination.js" defer></script>';
     }
-    
 }
-
-?>
-
-

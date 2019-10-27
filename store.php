@@ -7,11 +7,13 @@ require_once 'db.php';
 // старт сессии
 session_start();
 
+// если пользователь не авторизован
 if (!isset($_SESSION['user']['is_login']) && !isset($_COOKIE['user']['is_login'])) {
     header('Location: /'); // редирект на главную
     exit;
 }
 
+// если данных нет в сессии
 if (!isset($_SESSION['user'])) {
     // если существуют куки с данными
     if (isset($_COOKIE['user'])) {
@@ -21,6 +23,7 @@ if (!isset($_SESSION['user'])) {
     $email = $_SESSION['user']['email'];
 }
 
+// получить картинку текущего пользователя
 $image = getUserImage($pdo,$email)['image'];
 
 if ($image == 'no-user.jpg') {
@@ -34,13 +37,14 @@ if ($image == 'no-user.jpg') {
  * Получение данных из запроса (получение данных из формы и дальнейшая работа с ними)
  *
  * @param [object] $pdo
+ * @param [string] $image
  * @return void
  */
 function getRequestData($pdo, $image) {
-    $userId = $_POST['id'] ? $_POST['id'] : null;                           // получение ID комментатора
-    $text = trim(htmlspecialchars($_POST['text'])); // получение текста комментария
-    $date = date('Y-m-d');
-    $page = $_POST['page'];                                   // устаковка даты добавления нового комментария
+    $userId = $_POST['id'] ? $_POST['id'] : null;    // получение ID комментатора
+    $text = trim(htmlspecialchars($_POST['text']));  // получение текста комментария
+    $date = date('Y-m-d');                           // устаковка даты добавления нового комментария
+    $page = $_POST['page'];                          // получение текущей страницы         
 
     $messages = []; // массив для хранения флеш-сообщений
 
@@ -65,10 +69,13 @@ function getRequestData($pdo, $image) {
 
         
     } else {
+        // если комментарий не введен
         if (empty($text)) {
             $messages['errors']['text'] = 'Введите Ваш комментарий!';
         }
     }
+
+    // данные для JSON (много лишнего для дебага)
     $data = [
         'messages' => $messages,
         'POST' => $_POST,
@@ -80,6 +87,8 @@ function getRequestData($pdo, $image) {
         'author' => isset($_SESSION['user']['name']) ?  $_SESSION['user']['name'] : $_COOKIE['user']['name'],
         'COOKIE' => $_COOKIE,
     ];
+
+    // отправка данных
     echo json_encode($data, JSON_UNESCAPED_UNICODE);
     die;
 }
@@ -120,6 +129,7 @@ function getUserImage($pdo, $currentUser) {
     return $user;
 }
 
+// если пользователь нажал на кнопку отправить комментарий
 if (isset($_POST['store'])) {
     // вызов функции
     getRequestData($pdo, $image);

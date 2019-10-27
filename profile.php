@@ -2,9 +2,9 @@
 // старт сессии
 session_start();
 
+// подключение базы данных и функций
 require_once('db.php');
 require_once('functions.php');
-
 
 
 // если пользователь не авторизован
@@ -27,12 +27,14 @@ if (!isset($_SESSION['user'])) {
     $email = $_SESSION['user']['email'];
 }
 
-
+// заголовок страницы
 $title = "Профиль";
 
-
+// получение картинки пользователя из базы
 $image = getUserImage($pdo,$email)['image'];
 
+
+// если картинка заглушка, подключать из другого места
 if ($image == 'no-user.jpg') {
     $image = 'markup/img/' . $image;
 } else {
@@ -40,11 +42,6 @@ if ($image == 'no-user.jpg') {
     $image = 'uploads/' . $image;
 }  
 
-// получение изображения текущего пользователя из базы
-// $user = getUserImage($pdo, $email);
-
-// запись в сессию названия полученного изображения для отображения
-// $image = $user['image'];
 
 /**
  * Редактирование профиля
@@ -62,18 +59,18 @@ function changeProfile($pdo, $email, $user, $image, $name) {
 
     // почта текущего пользователя
     $currentUser = $email;
+    // имя текущего пользователя
     $currentName = $name;
 
     // получение данных с полей
-    $name = trim(htmlspecialchars($_POST['name']));
+    $name = trim(htmlentities($_POST['name']));
     $email = trim(htmlspecialchars($_POST['email']));
     $file = trim(htmlspecialchars($_POST['file']));
 
-
-    
     $path_parts = mb_pathinfo($file);
 
 
+    // статус валидации
     $validation = true;
 
     // доступные форматы загружаемых файлов
@@ -91,15 +88,8 @@ function changeProfile($pdo, $email, $user, $image, $name) {
     }
 
     
-    
-    //dd($file);
-    
-    // правила валидации полей формы и добавление сообщений для вывода под полями
-    // if (empty($name)) {
-    //     $validation = false;
-    //     $messages['errors']['name'] = 'Ведите имя!';
-    // }
-    // валидация на уже существующий email
+    // валидация полей
+
     if (!empty($name) && empty($email)) {
         $email = $currentUser;
         $validation = true;
@@ -109,13 +99,11 @@ function changeProfile($pdo, $email, $user, $image, $name) {
         $validation = false;
         $messages['errors']['name'] = 'Длина имени должна содержать больше 4-х символов!';
     }
-    
     if ((empty($name) && !empty($email)) || (!empty($name) && !empty($email))) {
+
         $name = empty($name) ? $currentName : $name;
         $validation = true;
         $messages = [];
-
-        
 
         if (!empty($file)) {
             $validation = true;
@@ -154,27 +142,18 @@ function changeProfile($pdo, $email, $user, $image, $name) {
 
     
     // формирование SET конструкции для выполнения запроса
-    
     $set = '';
     $data = [];
 
-    
+    // данные для запроса
     $data['name'] = $name;
     $data['email'] = $email;
 
-    // если в поле было выбрано изображение
-    // if ($_SESSION['isAvailable'] && !empty($_SESSION['fileName'])) {
-    //     // добавить в массив данных имя изображения
-    //     $data['image'] = $_SESSION['fileName'];
-    // }
-
     
-
     // если поля прошли валидацию
     if ($validation == true) {
 
-        // $_SESSION['validation'] = true;
-
+        // формируем SET конструкцию
         foreach ($data as $key => $val) {
             $set .= $key . ' = :' . $key . ', ';
         }
@@ -185,19 +164,14 @@ function changeProfile($pdo, $email, $user, $image, $name) {
                 SET $set 
                 WHERE email = '$currentUser'";
 
-                //dd($sql);
 
         // подготовка запроса
         $stmt = $pdo->prepare($sql);
         // выполнение запроса
         $stmt->execute($data);
 
-        
         // освежить данные в сессиях и куки, удаляя их, а затем устанавливая заново
         if (isset($_SESSION['user'])) {
-            //$name = !empty($name) ? $name : $_SESSION['user']['name'];
-            //$email = !empty($email) ? $email : $_SESSION['user']['email'];
-
             unset($_SESSION['user']);
             $userData['name'] = $name;
             $userData['email'] = $email;
@@ -205,21 +179,16 @@ function changeProfile($pdo, $email, $user, $image, $name) {
             $_SESSION['user'] = $userData;
         }
         if(isset($_COOKIE['user'])) {
-            //$name = !empty($name) ? $name : $_COOKIE['user']['name'];
-            //$email = !empty($email) ? $email : $_COOKIE['user']['email'];
             setcookie('user[is_login]', '', time()-5);
-
             setcookie('user[name]', $name, time() + 60 * 2);
             setcookie('user[email]', $email, time() + 60 * 2);
             setcookie('user[is_login]', true, time() + 60 * 2);
         }
 
-        $title = $name;
-
-   
         // добавление флеш-сообщения
         $messages['success'] = 'Изменения сохранены!';
     }
+
     
     $image = getUserImage($pdo,$email)['image'];
 
@@ -230,8 +199,10 @@ function changeProfile($pdo, $email, $user, $image, $name) {
         $image = 'uploads/' . $image;
     } 
     
+    // записываем в сессию статус валидации
     $_SESSION['validation'] = $validation;
 
+    // данные для json (много лишнего для дебага)
     $data = [
         'messages' => $messages,
         'userImage' => $image,
@@ -249,24 +220,9 @@ function changeProfile($pdo, $email, $user, $image, $name) {
         'SQL' => $sql
     ];
     
-    
-    
-
-    
+    // отправляем данные в json формате
     echo json_encode($data);
     die;
-    // запись флеш-сообщений в сессию
-    
-}
-
-
-function mb_pathinfo($filepath) {
-    preg_match('%^(.*?)[\\\\/]*(([^/\\\\]*?)(\.([^\.\\\\/]+?)|))[\\\\/\.]*$%im', $filepath, $m);
-    if ($m[1]) $ret['dirname'] = $m[1];
-    if ($m[2]) $ret['basename'] = $m[2];
-    if ($m[5]) $ret['extension'] = $m[5];
-    if ($m[3]) $ret['filename'] = $m[3];
-    return $ret;
 }
 
 /**
@@ -285,6 +241,7 @@ function getUserImage($pdo, $currentUser) {
 
     $stmt = $pdo->query($sql);
     $user = $stmt->fetch();
+
     return $user;
 }
 
@@ -312,8 +269,6 @@ function checkEmail($pdo, $email, $currentUser) {
 if (isset($_POST['edit'])) {
     changeProfile($pdo, $email, $user, $image, $name);
 }
-
-
 ?>
 
 <?php require_once('includes/header.php'); ?>
@@ -340,7 +295,7 @@ if (isset($_POST['edit'])) {
                                     <div class="col-md-8">
                                         <div class="form-group">
                                             <label for="exampleFormControlInputname">Имя</label>
-                                            <input type="text" class="form-control" name="name" id="exampleFormControlInputname" placeholder="<?= $name ?>" maxlength="30">
+                                            <input type="text" class="form-control" name="name" id="exampleFormControlInputname" placeholder="<?= $name ?>" maxlength="20">
                                             <span class="invalid-feedback" role="alert" style="display: none;">
                                                 <strong></strong>
                                             </span>
@@ -365,8 +320,8 @@ if (isset($_POST['edit'])) {
                                                     <label class="custom-file-label" id="exampleFormControlInputfile">Выберите изображение</label>
                                                 </div>
 
-                                            <!-- <label for="exampleFormControlInputimage">Аватар</label>
-                                            <input type="file" class="form-control" name="file" id="exampleFormControlInputfile"> -->
+                                                <!-- <label for="exampleFormControlInputimage">Аватар</label>
+                                                <input type="file" class="form-control" name="file" id="exampleFormControlInputfile"> -->
                                             
                                             
                                                 <span class="invalid-feedback" role="alert" style="display: none;">
@@ -392,8 +347,6 @@ if (isset($_POST['edit'])) {
                         <div class="card-header" id="password"><h3>Безопасность</h3></div>
 
                         <div class="card-body">
-                            
-
                             <form action="password.php#password" method="post">
                                 <div class="row">
                                     <div class="col-md-8">
@@ -401,9 +354,9 @@ if (isset($_POST['edit'])) {
                                             <label for="exampleFormControlInputcurrent">Текущий пароль</label>
                                             <input type="password" name="current" class="form-control" id="exampleFormControlInputcurrent">
                                             
-                                                <span class="invalid-feedback" role="alert" style="display: none;">
-                                                    <strong>></strong>
-                                                </span>
+                                            <span class="invalid-feedback" role="alert" style="display: none;">
+                                                <strong>></strong>
+                                            </span>
                                             
                                         </div>
 
@@ -411,22 +364,22 @@ if (isset($_POST['edit'])) {
                                             <label for="exampleFormControlInputpassword">Новый пароль</label>
                                             <input type="password" name="password" class="form-control" id="exampleFormControlInputpassword">
                                             
-                                                <span class="invalid-feedback" role="alert" style="display: none;">
-                                                    <strong></strong>
-                                                </span>
+                                            <span class="invalid-feedback" role="alert" style="display: none;">
+                                                <strong></strong>
+                                            </span>
 
-                                                <span class="invalid-feedback" role="alert" style="display: none;">
-                                                    <strong></strong>
-                                                </span>
+                                            <span class="invalid-feedback" role="alert" style="display: none;">
+                                                <strong></strong>
+                                            </span>
                                         </div>
 
                                         <div class="form-group">
                                             <label for="exampleFormControlInputpassword_confirmation">Новый пароль еще раз</label>
                                             <input type="password" name="password_confirmation" class="form-control" id="exampleFormControlInputpassword_confirmation">
                                             
-                                                <span class="invalid-feedback" role="alert">
-                                                    <strong></strong>
-                                                </span>
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong></strong>
+                                            </span>
                                         </div>
 
                                         <button type="submit" id="edit-passw" name="edit-passw" class="btn btn-success">Сохранить</button>

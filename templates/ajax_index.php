@@ -37,6 +37,7 @@
                         </div>
                     </div>
 
+                    <!-- Пагинация -->
                     <?php if ($paginator['comments'] && $paginator['pageCount'] > 1): ?>
                     <div class="col-md-12" id="comments-pagination">
                         <ul class="pagination justify-content-center">

@@ -54,6 +54,7 @@
                         </div>
                     </div>
 
+                    <!-- Пагинация -->
                     <?php if ($paginator['comments'] && $paginator['pageCount'] > 1): ?>
                     <div class="col-md-12" id="comments-pagination">
                         <ul class="pagination justify-content-center">
@@ -85,6 +86,7 @@
                 </div>
                 <div class="row justify-content-center">
                     <div class="col-md-12" style="margin-top: 5px;">
+                        <!-- Если пользователь авторизован -->
                         <?php if (isset($isLogin)): ?>
                         <div class="card border-secondary">
                             <div class="card-header"><h3>Оставить комментарий</h3></div>

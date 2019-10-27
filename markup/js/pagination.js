@@ -1,4 +1,5 @@
 $(document).ready(function(){
+    // Ссылки страниц пагинации
     $('.pagination .page-link').on('click', function(e) {
         e.preventDefault();
         page = $(this).attr('data-href');

@@ -58,14 +58,9 @@ function daleteComment($pdo) {
         'messages' => $messages,
     ];
 
+    // отправляем json
     echo json_encode($data);
     die;
-
-    // сохраняем флеш в сессию
-    //$_SESSION['messages'] = $messages;
-
-    // редиректим в админку
-    //header('Location: /admin.php');
 }
 
 /**
@@ -84,5 +79,5 @@ function prettyDate($date) {
 
     return $date;
 }
-
+// вызов функции
 daleteComment($pdo);

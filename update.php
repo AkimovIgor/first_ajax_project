@@ -32,7 +32,7 @@ function updateStatus($pdo) {
     $stmt = $pdo->query($sql);
     $comment = $stmt->fetch();
 
-    // получаем текущий статус
+    // получаем текущий статус коммента
     $comment = $comment['status'];
 
     // если комментарий существует
@@ -61,21 +61,18 @@ function updateStatus($pdo) {
         
     } else {
         $messages['errors']['status'] = 'Такого комментария не существует!';
-        
     }
 
+    // данные для JSON
     $data = [
         'messages' => $messages,
         'status' => $data['status']
     ];
 
+    // отправляем данные
     echo json_encode($data);
     die;
-    // записываем флеш в сессию
-    // $_SESSION['messages'] = $messages;
-
-    // редиректим в админку
-    // header('Location: /admin.php');
 }
 
+// вызываем функцию
 updateStatus($pdo);

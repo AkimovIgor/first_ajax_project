@@ -1,10 +1,12 @@
 <?php
-
+// подключение соединения с БД и функций
 require_once('db.php');
 require_once('functions.php');
 
+// стартуем сессию
 session_start();
 
+// если пользователь не авторизован
 if (!isset($_SESSION['user']['is_login']) && !isset($_COOKIE['user']['is_login'])) {
     header('Location: /'); // редирект на главную
     exit;
@@ -22,11 +24,13 @@ if (!isset($_SESSION['user'])) {
     $email = $_SESSION['user']['email'];
 }
 
-
+// email текущего пользователя
 $currentUser = $email;
 
+// получение статуса валидации из сессии
 $validation = $_SESSION['validation'];
 
+// если существует загружаемый файл
 if (isset($_FILES['file'])) {
 
     // каталог для загружаемых файлов
@@ -52,20 +56,10 @@ if (isset($_FILES['file'])) {
         } 
     }
 
-    // if ($isAvailable && !empty($fileName)) {
-    //     $validation = true;
-    //     $messages = [];
-    // }
-    // if (!isset($isAvailable) && $fileName) {
-    //     $validation = false;
-    //     $messages['errors']['file'] = 'Недопустимый формат файла! Допустимые форматы: ' . implode(', ', $_SESSION['availableFormats']);
-    // }
-    
-
-    // dd($validation);
-
+    // если формат файла допустим и валидация данных прошла успешно
     if (isset($isAvailable) && $validation) {
 
+        // формируем запрос
         $sql = "SELECT image 
             FROM users 
             WHERE email = :email 
@@ -74,6 +68,7 @@ if (isset($_FILES['file'])) {
         $stmt = $pdo->prepare($sql);
         $stmt->execute(['email' => $currentUser]);
         
+        // получаем картинку из базы
         $dbFileName = $stmt->fetch();
         
         // если такая картинка уже существует
@@ -88,15 +83,18 @@ if (isset($_FILES['file'])) {
         }
     }
 
+    // записываем данные в сессию
     $_SESSION['fileName'] = $fileName;
-    
     $_SESSION['isAvailable'] = $isAvailable;
     $_SESSION['availableFormats'] = $availableFormats;
 
     
+    // если валидация данных прошла успешно и формат файла допустим
     if ($validation && $_SESSION['isAvailable']) {
+        // получаем картинку из сессии
         $image = $_SESSION['fileName'];
 
+        // если картинка - заглушка, подключаем её с одной папки
         if ($image == 'no-user.jpg') {
             $image = 'markup/img/' . $image;
         } else {
@@ -110,8 +108,6 @@ if (isset($_FILES['file'])) {
                 SET image = :image
                 WHERE email = '$currentUser'";
 
-                //dd($sql);
-
         // подготовка запроса
         $stmt = $pdo->prepare($sql);
         // выполнение запроса
@@ -119,7 +115,7 @@ if (isset($_FILES['file'])) {
     }
 
     
-
+    // данные для JSON (много лишнего для дебага)
     $rsp = array(
         'messages' => $messages,
         'userImage' => $image,
@@ -135,11 +131,8 @@ if (isset($_FILES['file'])) {
         'currUser' => $currentUser,
         'SQL' => $sql
     );
-    // unset($_SESSION['fileName']);
-    // unset($_SESSION['isAvailable']);
-    // unset($_SESSION['uploadDir']);
-    // unset($_SESSION['availableFormats']);
-    // unset($_SESSION['uploadFile']);
+    
+    // удаляем ненужные сессии
     unset($_SESSION['validation']);
     unset($_SESSION['fileName']);
     unset($_SESSION['isAvailable']);
@@ -147,6 +140,7 @@ if (isset($_FILES['file'])) {
     unset($_SESSION['availableFormats']);
     unset($_SESSION['uploadFile']);
 
+    // отправляем данные
     echo json_encode($rsp);
     exit;
 }

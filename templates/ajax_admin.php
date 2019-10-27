@@ -19,6 +19,7 @@
         <div class="card-header"><h3>Админ панель</h3></div>
 
         <div class="card-body" style="overflow-x: auto;">
+            <!-- Если массив с комментариями не пуст -->
             <?php if (!empty($paginator['comments'])): ?>
             <table class="table">
                 <thead>
@@ -32,6 +33,7 @@
                 </thead>
 
                 <tbody>
+                    <!-- Вывод комментариев с пагинацией -->
                     <?php foreach ($paginator['comments'] as $comment): ?>
                         <tr>
                             <td>
@@ -60,6 +62,7 @@
         </div>
     </div>
 
+    <!-- Пагинация -->
     <?php if ($paginator['comments'] && $paginator['pageCount'] > 1): ?>
         <div class="col-md-12" id="comments-pagination">
             <ul class="pagination justify-content-center">
